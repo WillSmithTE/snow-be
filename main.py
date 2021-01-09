@@ -5,29 +5,39 @@ from flask_cors import CORS
 import json
 import os
 
-data = {}
+class Data:
+    def __init__(self, year, data):
+        self.year = year
+        self.data = data
 
 class YearData:
-    def __init__(self, date, name, level):
+    def __init__(self, date, name, snow):
         self.date = date
         self.name = name
-        self.level = level
+        self.snow = snow
 
     def __repr__(self):
-        print(self.date, self.name, self.level)
-        return "-date " + self.date + "-name" + self.name + "-level" + self.level
+        return "-date " + self.date + "-name" + self.name + "-snow" + str(self.snow) + "\n"
 
 def getData():
-    response = requests.get("https://www.snowyhydro.com.au/wp-content/themes/snowyhydro/inc/getData.php?yearA=2020&yearB=1976").json() 
-    for year in response:
-        data[year] = 'hi'
-        level = response[year]['snowyhydro']['level']
-        onlySnow = list(filter(lambda x: 'snow' in x, level))
-        yearData = list(map(lambda x : toYearData(x), onlySnow))
-        print(yearData)
-        data[year] = yearData
-        print('data', data)
-    return data
+    listData = []
+    i = 2011
+    while i < 2020:
+        [first, second] = [str(i), str(i+1)]
+        response = requests.get("https://www.snowyhydro.com.au/wp-content/themes/snowyhydro/inc/getData.php?yearA=" + first + "&yearB=" + second).json() 
+        for year in response:
+            level = response[year]['snowyhydro']['level']
+            onlySnow = list(filter(lambda x: 'snow' in x, level))
+            yearData = list(map(lambda x : toYearData(x), onlySnow))
+            for thing in yearData:
+                print(thing)
+            noNullsYearData = list(filter(lambda x : x is not None, yearData))
+            print('-------[')
+            for thing in yearData:
+                print(thing)
+            listData.append(Data(year, noNullsYearData))
+        i += 2
+    return listData
 
 def toYearData(level):
     snow = level['snow']
@@ -38,7 +48,7 @@ def toYearData(level):
         return None
     date = level['-date']
     name = onlySpencersCreek[0]['-name']
-    snow = onlySpencersCreek[0]['#text']
+    snow = float(onlySpencersCreek[0]['#text'])
     return YearData(date, name, snow)
 
 data = getData()
@@ -48,7 +58,6 @@ CORS(app)
 
 @app.route('/api/spencersCreek/<year>', methods=['GET'])
 def getSpencersCreekData(year):
-    print(data)
     return json.dumps(data, default=lambda x: x.__dict__)
 
 app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
