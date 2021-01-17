@@ -22,7 +22,7 @@ class YearData:
 def getData():
     listData = []
     i = 1976
-    while i < 2019:
+    while i <= 2020:
         [first, second] = [str(i), str(i+1)]
         response = requests.get("https://www.snowyhydro.com.au/wp-content/themes/snowyhydro/inc/getData.php?yearA=" + first + "&yearB=" + second).json() 
         for year in response:
