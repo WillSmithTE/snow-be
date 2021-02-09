@@ -1,9 +1,11 @@
 import requests
-from util import *
+from util import read, save
 from flask import Flask
 from flask_cors import CORS
 import json
 import os
+
+DATA_FILE = 'data.pickle'
 
 class Data:
     def __init__(self, year, data):
@@ -20,23 +22,26 @@ class YearData:
         return "-date " + self.date + "-name" + self.name + "-snow" + str(self.snow) + "\n"
 
 def getData():
-    listData = []
-    i = 1976
-    while i <= 2020:
-        [first, second] = [str(i), str(i+1)]
-        response = requests.get("https://www.snowyhydro.com.au/wp-content/themes/snowyhydro/inc/getData.php?yearA=" + first + "&yearB=" + second).json() 
-        for year in response:
-            level = response[year]['snowyhydro']['level']
-            onlySnow = list(filter(lambda x: 'snow' in x, level))
-            yearData = list(map(lambda x : toYearData(x), onlySnow))
-            for thing in yearData:
-                print(thing)
-            noNullsYearData = list(filter(lambda x : x is not None, yearData))
-            print('-------[')
-            for thing in yearData:
-                print(thing)
-            listData.append(Data(year, noNullsYearData))
-        i += 2
+    listData = read(DATA_FILE)
+    if listData is None:
+        listData = []
+        i = 1976
+        while i <= 2020:
+            [first, second] = [str(i), str(i+1)]
+            response = requests.get("https://www.snowyhydro.com.au/wp-content/themes/snowyhydro/inc/getData.php?yearA=" + first + "&yearB=" + second).json() 
+            for year in response:
+                level = response[year]['snowyhydro']['level']
+                onlySnow = list(filter(lambda x: 'snow' in x, level))
+                yearData = list(map(lambda x : toYearData(x), onlySnow))
+                for thing in yearData:
+                    print(thing)
+                noNullsYearData = list(filter(lambda x : x is not None, yearData))
+                print('-------[')
+                for thing in yearData:
+                    print(thing)
+                listData.append(Data(year, noNullsYearData))
+            i += 2
+        save(listData, DATA_FILE)
     return listData
 
 def toYearData(level):
