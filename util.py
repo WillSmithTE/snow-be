@@ -1,7 +1,8 @@
 import pickle
+import logging
 
 def save(data, filename):
-    file = open(filename, 'ab')
+    file = open(filename, 'wb')
     pickle.dump(data, file)
     file.close()
 
@@ -13,4 +14,5 @@ def read(filename):
         file.close()
         return data
     except:
+        logging.info('error reading file', exc_info=True)
         return None
