@@ -12,8 +12,8 @@ app = Flask(__name__)
 CORS(app)
 
 
-@app.route('/api/spencersCreek/<year>', methods=['GET'])
-def getSpencersCreekData(year):
+@app.route('/api/spencersCreek', methods=['GET'])
+def getSpencersCreekData():
     return json.dumps(data, default=lambda x: x.__dict__)
 
 
