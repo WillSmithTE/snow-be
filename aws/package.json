@@ -1,0 +1,6 @@
+{
+    "name": "refresh-lambda",
+    "dependencies": {
+        "node-fetch": "^2.6.1"
+    }
+}
