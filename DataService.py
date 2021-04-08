@@ -55,3 +55,21 @@ def toYearData(level):
     name = onlySpencersCreek[0]['-name']
     snow = float(onlySpencersCreek[0]['#text'])
     return YearData(date, name, snow)
+
+def isDataOutdated():
+    latestSavedDate = getLatestSavedDate()
+    if latestSavedDate:
+        newData = getData(False)
+        newLastDate = getLatestDate(newData)
+        return latestSavedDate != newLastDate
+    else:
+        return False
+
+def getLatestSavedDate():
+    savedData = getSavedData()
+    return getLatestDate(savedData)
+
+def getLatestDate(data):
+    lastYearData = data[len(data) - 1].data
+    latestDate = lastYearData[len(lastYearData) - 1].date
+    return latestDate
