@@ -22,8 +22,8 @@ def getSpencersCreekData():
 def refreshData():
     message = None
     if isDataOutdated():
-        message = 'Data has been refreshed'
         updateData()
+        message = 'Data has been refreshed'
     else:
         message = 'No new data found to refresh'
     logging.info(message)
